@@ -3,7 +3,7 @@
 #include <windows.h> //system("cls"); 함수를 호출하기 위한 헤더파일. system("cls"); = 화면을 깨끗하게 지웁니다.
 
 struct Student { //구조체. 학생에 관한 정보 포함
-	char name[12]; //이름
+	char name[13]; //이름 영어 12자, 한글 4자까지 넣을 수 있습니다.
 	int age; //나이
 };
 
