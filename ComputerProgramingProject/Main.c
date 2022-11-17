@@ -145,10 +145,11 @@ void inquiryInfo(int n) { //학생 조회 시 사용하는 함수
 		return;
 	}
 	system("cls");
-	printf("학생 정보 출력\n****************************************\n번호\t\t이름\t\t나이\t\t휴대폰 번호\t\t주소\t\t\n");
+	printf("학생 정보 출력\n********************************************************************************\n번호\t\t이름\t\t나이\t\t휴대폰 번호\t\t주소\t\t\n");
 	for (int i = 0; i < n; i++) {
 		printf("%d\t\t%s\t\t%d\t\t%s\t\t%s\n", i, studentInfo[i].name, studentInfo[i].age, studentInfo[i].phone, studentInfo[i].address);
 	}
+	printf("********************************************************************************\n총 %d명의 학생 정보가 있습니다.\n", n);
 }
 
 int deleteInfo(int n) { //학생 정보 삭제 시 사용하는 함수. 정상적으로 회원이 삭제되었는지 여부를 돌려줌
