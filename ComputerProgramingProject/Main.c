@@ -5,6 +5,8 @@
 struct Student { //구조체. 학생에 관한 정보 포함
 	char name[13]; //이름 영어 12자, 한글 4자까지 넣을 수 있습니다.
 	int age; //나이
+	char phone[12]; //전화번호
+	char address[31]; //주소
 };
 
 struct Student studentInfo[20]; //구조체 20개 생성. 학생 최대 20명까지 등록 가능. 전역 변수
@@ -129,6 +131,10 @@ int addInfo(int n) { //학생 추가 시 사용하는 함수
 	scanf("%s", studentInfo[n].name); //이름을 입력 받아 studentInfo 배열에 차례대로 집어넣음
 	printf("나이: ");
 	scanf_s(" %d", &studentInfo[n].age); //나이를 입력 받아 studentInfo 배열에 차례대로 집어넣음
+	printf("휴대폰 번호('-'포함x): ");
+	scanf("%s", studentInfo[n].phone);
+	printf("주소(최대 30Byte): ");
+	scanf("%s", studentInfo[n].address);
 	printf("---추가 완료---\n");
 	return 1; //정상적으로 종료되어 true 리턴
 }
@@ -139,9 +145,9 @@ void inquiryInfo(int n) { //학생 조회 시 사용하는 함수
 		return;
 	}
 	system("cls");
-	printf("학생 정보 출력\n****************************************\n번호\t\t이름\t\t나이\t\t\n");
+	printf("학생 정보 출력\n****************************************\n번호\t\t이름\t\t나이\t\t휴대폰 번호\t\t주소\t\t\n");
 	for (int i = 0; i < n; i++) {
-		printf("%d\t\t%s\t\t%d\t\t\n", i, studentInfo[i].name, studentInfo[i].age);
+		printf("%d\t\t%s\t\t%d\t\t%s\t\t%s\n", i, studentInfo[i].name, studentInfo[i].age, studentInfo[i].phone, studentInfo[i].address);
 	}
 }
 
@@ -161,6 +167,8 @@ int deleteInfo(int n) { //학생 정보 삭제 시 사용하는 함수. 정상적으로 회원이 삭�
 	for (int i = m + 1; i < n; i++) { //학생 정보 삭제 및 배열 뒷쪽의 학생 정보를 앞으로 당김.
 		strcpy(studentInfo[i - 1].name, studentInfo[i].name);
 		studentInfo[i - 1].age = studentInfo[i].age;
+		strcpy(studentInfo[i - 1].phone, studentInfo[i].phone);
+		strcpy(studentInfo[i - 1].address, studentInfo[i].address);
 	}
 	return 1; //true를 돌려 줌
 }
