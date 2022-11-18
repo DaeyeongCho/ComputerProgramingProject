@@ -1,12 +1,15 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <windows.h> //system("cls"); 함수를 호출하기 위한 헤더파일. system("cls"); = 화면을 깨끗하게 지웁니다.
+#include <stdlib.h>
+#include <string.h>
 
 struct Student { //구조체. 학생에 관한 정보 포함
 	char name[13]; //이름 영어 12자, 한글 4자까지 넣을 수 있습니다.
 	int age; //나이
 	char phone[12]; //전화번호
 	char address[31]; //주소
+	double scores[3]; //과목 수 0:출석 점수(10.0), 1:시험 성적(60.0), 2:과제물(30.0)
 };
 
 struct Student studentInfo[20]; //구조체 20개 생성. 학생 최대 20명까지 등록 가능. 전역 변수
@@ -29,12 +32,14 @@ struct Student studentInfo[20]; //구조체 20개 생성. 학생 최대 20명까지 등록 가능
 이후 출력하실 때에도 printf("%d", studentInfo[14].age);로 쓰시면 값을 얻어낼 수 있습니다.
 */
 
+int studentCount = 0; //등록된 학생의 숫자를 나타냄. 등록 된 학생 수 만큼 반복할 때도 유용함. 코딩 하실 때 활용하시라고 전역변수로 해두긴 했는데 현재 등록 되어있는 학생 수와 일치해야 합니다. 값이 틀리면 오류가 날 수 있으므로 함부로 값을 바꾸면 안됩니다.
+
 //-----------------------------------------------------------------------------------조대영 변수, 함수 원형
 
 void studentInformation(void); //학생 인적사항 관리 함수 원형
-int addInfo(int n); //학생 추가 시 사용하는 함수 원형
+void addInfo(); //학생 추가 시 사용하는 함수 원형
 void inquiryInfo(int n); //학생 조회 시 사용하는 함수 원형
-int deleteInfo(int n); //학생 정보 삭제 시 사용하는 함수 원형
+void deleteInfo(); //학생 정보 삭제 시 사용하는 함수 원형
 
 //-----------------------------------------------------------------------------------정재헌 변수, 함수 원형
 
@@ -94,10 +99,11 @@ int main(void) {
 }
 
 
+//-----------------------------------------------------------------------------------학생 추가 시 사용하는 함수. 조대영 담당
+
 
 void studentInformation(void) { //학생 인적사항 관리 함수. 조대영 담당
 	int select; //메뉴 선택 시 입력 값 저장 변수
-	static int studentCount = 0; //등록된 학생의 숫자를 나타냄. 등록 된 학생 수 만큼 반복할 때도 유용함.
 	system("cls");
 
 	printf("********************\n학생 인적사항 관리 모드\n");
@@ -108,17 +114,13 @@ void studentInformation(void) { //학생 인적사항 관리 함수. 조대영 담당
 
 		switch (select) {
 		case 1:
-			if (addInfo(studentCount)) { //학생 추가 함수로 분기
-				studentCount++; //정상적으로 학생 추가 시 학생 수 1 증가
-			}
+			addInfo(); //학생 추가 함수로 분기
 			break;
 		case 2:
 			inquiryInfo(studentCount); //학생 조회 함수로 분기
 			break;
 		case 3:
-			if (deleteInfo(studentCount)) { //학생 정보 삭제 함수로 분기
-				studentCount--; //정상적으로 학생 정보 삭제 완료 시 학생 수 1 감소
-			}
+			deleteInfo(); //학생 정보 삭제 함수로 분기
 			break;
 		case 4:
 			return;
@@ -131,23 +133,24 @@ void studentInformation(void) { //학생 인적사항 관리 함수. 조대영 담당
 	}
 }
 
-//-----------------------------------------------------------------------------------학생 추가 시 사용하는 함수. 조대영 담당
-
-int addInfo(int n) {
-	if (n >= 20) { //학생이 20명 등록되어 꽉 차게되면 더 이상 등록 불가능함을 알리고 false 리턴
+void addInfo() {
+	if (studentCount >= 20) { //학생이 20명 등록되어 꽉 차게되면 더 이상 등록 불가능함을 알리고 false 리턴
 		printf("더 이상 학생을 등록할 수 없습니다.");
-		return 0;
+		return;
 	}
 	printf("이름(최대 12Byte): ");
-	scanf("%s", studentInfo[n].name); //이름을 입력 받아 studentInfo 배열에 차례대로 집어넣음
+	scanf("%s", studentInfo[studentCount].name); //이름을 입력 받아 studentInfo 배열에 차례대로 집어넣음
 	printf("나이: ");
-	scanf_s(" %d", &studentInfo[n].age); //나이를 입력 받아 studentInfo 배열에 차례대로 집어넣음
+	scanf_s(" %d", &studentInfo[studentCount].age); //나이를 입력 받아 studentInfo 배열에 차례대로 집어넣음
 	printf("휴대폰 번호('-'포함x): ");
-	scanf("%s", studentInfo[n].phone);
+	scanf("%s", studentInfo[studentCount].phone);
 	printf("주소(최대 30Byte): ");
-	scanf("%s", studentInfo[n].address);
+	scanf("%s", studentInfo[studentCount].address);
+	for (int i = 0; i < 3; i++) { //성적 초기화
+		studentInfo[studentCount].scores[i] = -1;
+	}
 	printf("---추가 완료---\n");
-	return 1; //정상적으로 종료되어 true 리턴
+	studentCount++; //정상적으로 학생 추가 시 학생 수 1 증가
 }
 
 void inquiryInfo(int n) { //학생 조회 시 사용하는 함수 
@@ -163,26 +166,26 @@ void inquiryInfo(int n) { //학생 조회 시 사용하는 함수
 	printf("********************************************************************************\n총 %d명의 학생 정보가 있습니다.\n", n);
 }
 
-int deleteInfo(int n) { //학생 정보 삭제 시 사용하는 함수. 정상적으로 회원이 삭제되었는지 여부를 돌려줌
+void deleteInfo() { //학생 정보 삭제 시 사용하는 함수. 정상적으로 회원이 삭제되었는지 여부를 돌려줌
 	int m; //몇 번째 학생을 삭제 할 지 번호를 받는 변수
-	if (n == 0) {
+	if (studentCount == 0) {
 		printf("삭제 할 학생 정보가 없습니다.\n");
-		return 0;
+		return;
 	}
-	inquiryInfo(n);
+	inquiryInfo(studentCount);
 	printf("삭제하고 싶은 학생 정보의 번호를 입력하세요.");
 	scanf("%d", &m);
-	if (m < 0 || m >= n) { //없는 학생 번호 입력 시 오류 출력 및 함수 종료. false를 돌려 줌
+	if (m < 0 || m >= studentCount) { //없는 학생 번호 입력 시 오류 출력 및 함수 종료. false를 돌려 줌
 		printf("잘못된 값입니다.\n");
 		return 0;
 	}
-	for (int i = m + 1; i < n; i++) { //학생 정보 삭제 및 배열 뒷쪽의 학생 정보를 앞으로 당김.
+	for (int i = m + 1; i < studentCount; i++) { //학생 정보 삭제 및 배열 뒷쪽의 학생 정보를 앞으로 당김.
 		strcpy(studentInfo[i - 1].name, studentInfo[i].name);
 		studentInfo[i - 1].age = studentInfo[i].age;
 		strcpy(studentInfo[i - 1].phone, studentInfo[i].phone);
 		strcpy(studentInfo[i - 1].address, studentInfo[i].address);
 	}
-	return 1; //true를 돌려 줌
+	studentCount--; //정상적으로 학생 정보 삭제 완료 시 학생 수 1 감소
 }
 
 
@@ -198,7 +201,7 @@ void attendance(void) {
 
 
 void grade(void) {
-	//여기에 구현하시면 됩니다. 이 함수 바깥쪽에 뭔가 작성하실 일 있으시면 그 부분은 따로 주석으로 표시해주시면 제가 확인해서 적용하도록 하겠습니다.
+	
 }
 
 
