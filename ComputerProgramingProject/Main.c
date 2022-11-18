@@ -47,6 +47,8 @@ void attendance(void); //출결관리 함수 원형
 
 //-----------------------------------------------------------------------------------길민준 변수, 함수 원형
 
+const char* stitles[3] = { "출석(10.0)","시험(60.0)","과제물(30.0)" };
+
 void grade(void); //성적관리 함수 원형
 void Run();
 int SelectMenu();//메뉴 출력 및 선택
@@ -55,7 +57,8 @@ void RemoveStudent();//학생 데이터 삭제
 void FindStudent();//학생 검색
 void ListStudent();//목록 보기
 int IsAvailNum(int num);//유효한 번호인지 판별
-int IsAvailScore(double score);//유효한 성적인지 판별
+int IsAvailScore(double score, int c);//유효한 성적인지 판별
+void ViewStuData(int n);
 
 //-----------------------------------------------------------------------------------조진욱 변수, 함수 원형
 
@@ -196,6 +199,16 @@ void deleteInfo() { //학생 정보 삭제 시 사용하는 함수. 정상적으로 회원이 삭제되�
 	studentCount--; //정상적으로 학생 정보 삭제 완료 시 학생 수 1 감소
 }
 
+int isEmpty() {
+	if (studentCount == 0) {
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
 
 //-----------------------------------------------------------------------------------출결관리 함수. 정재헌 담당
 
@@ -234,20 +247,21 @@ int SelectMenu()
 	int key = 0;
 	printf("*****************************************************************\n");
 	printf("성적 관리 프로그램 0:종료\n");
-	printf("1: 학생 데이터 입력 2: 학생 데이터 삭제 3: 학생 검색 4: 목록 보기 0: 메인 화면으로 \n");
+	printf("1: 학생 성적 입력 2: 학생 성적 초기화 3: 학생 검색 4: 목록으로 보기 0: 메인 화면으로 \n");
 	printf("*****************************************************************\n");
 	scanf_s("%d", &key);
 	return key;
 }
 
 void AddStudent() { //학생 데이터 입력
+	int num = -1;
 
+	inquiryInfo();
+	if (isEmpty()) {
+		return;
+	}
 
-	/*int num = 0;
-	Student* stu = 0;
-	int s = 0;
-
-	printf("추가할 학생 번호(1~%d): ", MAX_STUDENT);
+	printf("점수 입력 할 학생 번호(0 ~ %d): ", studentCount - 1);
 	scanf_s("%d", &num);
 
 	if (IsAvailNum(num) == 0)//유효한 번호가 아닐 때
@@ -256,48 +270,96 @@ void AddStudent() { //학생 데이터 입력
 		return;
 	}
 
-	if (stues[num - 1].num)//이미 번호를 설정한 상태일 때
-	{
-		printf("이미 추가하였습니다\n");
-		return;
-	}
-
-	//stues에는 1번 학생 데이터를 관리하는 메모리 주소
-	//따라서 stues+(num-1)은 num번 학생 데이터를 관리하는 메모리 주소
-	stu = stues + (num - 1);
-	stu->num = num;
-	printf("이름: ");
-	scanf_s("%s", stu->name, sizeof(stu->name));
-
-	for (s = 0; s < MAX_SUBJECT; s++)
+	printf("%s 학생의 성적을 입력합니다.", studentInfo[num].name);
+	
+	for (int s = 0; s < 3; s++)
 	{
 		printf("%s 성적:", stitles[s]);
-		scanf_s("%lf", stu->scores + s);
+		scanf_s("%lf", &studentInfo[num].scores[s]);
 
-		if (IsAvailScore(stu->scores[s]) == 0)//유효한 성적이 아닐 때
+		if (IsAvailScore(studentInfo[num].scores[s], s) == 0)//유효한 성적이 아닐 때
 		{
-			stu->scores[s] = -1;
+			studentInfo[num].scores[s] = -1;
 			printf("입력한 성적이 유효하지 않아서 %s 성적은 입력 처리하지 않았습니다.\n", stitles[s]);
 		}
-	}*/
+	}
 }
 
 void RemoveStudent() {//학생 데이터 삭제
+	int num = -1;
+	int s = 0;
 
+	inquiryInfo();
+	if (isEmpty()) {
+		return;
+	}
+
+	printf("성적 초기화 할 학생 번호(0~%d): ", studentCount - 1);
+	scanf_s("%d", &num);
+
+	if (IsAvailNum(num) == 0)//유효한 번호가 아닐 때
+	{
+		printf("범위를 벗어난 학생 번호입니다.\n");
+		return;
+	}
+
+	for (s = 0; s < 3; s++)
+	{
+		studentInfo[num].scores[s] = -1;
+	}
+
+	printf("삭제하였습니다.\n");
 }
 
 void FindStudent() { //학생 검색
+	int num = -1;
+	int s = 0;
 
+	inquiryInfo();
+	if (isEmpty()) {
+		return;
+	}
+
+	printf("검색할 학생 번호(0~%d): ", studentCount - 1);
+	scanf_s("%d", &num);
+
+	if (IsAvailNum(num) == 0)//유효한 번호가 아닐 때
+	{
+		printf("범위를 벗어난 학생 번호입니다.\n");
+		return;
+	}
+
+	ViewStuData(num);
 }
 
 void ListStudent() { //목록 보기
+	if (isEmpty()) {
+		printf("학생 정보가 없습니다.\n");
+		return;
+	}
 
+	system("cls");
+	printf("학생 성적 출력(성적이 -1인 곳은 미입력)\n********************************************************************************\n번호\t\t이름\t\t%s\t\t%s\t\t%s\t\t총점\n", stitles[0], stitles[1], stitles[2]);
+	for (int i = 0; i < studentCount; i++) {
+		printf("%d\t\t%s\t\t%.1lf\t\t\t%.1lf\t\t\t%.1lf\t\t\t%.1lf\n", i, studentInfo[i].name, studentInfo[i].scores[0], studentInfo[i].scores[1], studentInfo[i].scores[2], studentInfo[i].scores[0] + studentInfo[i].scores[1] + studentInfo[i].scores[2]);
+	}
+	printf("********************************************************************************\n총 %d명의 성적 정보가 있습니다.\n", studentCount);
 }
 int IsAvailNum(int num) { //유효한 번호인지 판별
-
+	return (num >= 0) && (num <= studentCount - 1);
 }
-int IsAvailScore(double score) { //유효한 성적인지 판별
+int IsAvailScore(double score, int c) { //유효한 성적인지 판별
+	double valid[3] = { 10.0, 60.0, 30.0 };
+	return (score >= 0) && (score <= valid[c]);
+}
 
+void ViewStuData(int n) {
+	int i = 0;
+	int s = 0;
+
+	printf("%s 학생의 %s: %.1lf점, %s: %.1lf점, %s: %.1lf점 총점: %.1lf점", studentInfo[n].name, stitles[0], studentInfo[n].scores[0], stitles[1], studentInfo[n].scores[1], stitles[2], studentInfo[n].scores[2], studentInfo[n].scores[0] + studentInfo[n].scores[1] + studentInfo[n].scores[2]);
+
+	printf("\n");
 }
 
 
