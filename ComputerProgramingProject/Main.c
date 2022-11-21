@@ -10,6 +10,7 @@ struct Student { //구조체. 학생에 관한 정보 포함
 	char phone[12]; //전화번호
 	char address[31]; //주소
 	double scores[3]; //과목 수 0:출석 점수(10.0), 1:시험 성적(60.0), 2:과제물(30.0)
+	int attendance; //0 결석, 1 출석, 2 지각
 };
 
 struct Student studentInfo[20]; //구조체 20개 생성. 학생 최대 20명까지 등록 가능. 전역 변수
@@ -40,10 +41,13 @@ void studentInformation(void); //학생 인적사항 관리 함수 원형
 void addInfo(); //학생 추가 시 사용하는 함수 원형
 void inquiryInfo(); //학생 조회 시 사용하는 함수 원형
 void deleteInfo(); //학생 정보 삭제 시 사용하는 함수 원형
+void sort();
 
 //-----------------------------------------------------------------------------------정재헌 변수, 함수 원형
 
 void attendance(void); //출결관리 함수 원형
+void attendanceAdd(void);
+void attendanceSearch();
 
 //-----------------------------------------------------------------------------------길민준 변수, 함수 원형
 
@@ -60,10 +64,6 @@ int IsAvailNum(int num);//유효한 번호인지 판별
 int IsAvailScore(double score, int c);//유효한 성적인지 판별
 void ViewStuData(int n);
 
-//-----------------------------------------------------------------------------------조진욱 변수, 함수 원형
-
-void seat(void); //좌석배정 함수 원형
-
 //-----------------------------------------------------------------------------------
 
 
@@ -76,7 +76,7 @@ int main(void) {
 	printf("********************\n학생 관리 앱\nMade By 조대영, 길민준, 정재헌, 조진욱\n"); //타이틀 출력
 
 	while (escape) {
-		printf("********************\n\t-메뉴-\n1.학생 인적사항 관리\n2.출결 관리\n3.성적 관리\n4.좌석 배정\n5.끝내기\n********************\n입력: "); //메뉴 출력
+		printf("********************\n\t-메뉴-\n1.학생 인적사항 관리\n2.출결 관리\n3.성적 관리\n4.끝내기\n********************\n입력: "); //메뉴 출력
 		scanf_s("%d", &select); //메뉴 선택
 
 		switch (select) {
@@ -92,11 +92,7 @@ int main(void) {
 			grade();
 			system("cls");
 			break;
-		case 4: //좌석배정 함수 분기
-			seat();
-			system("cls");
-			break;
-		case 5: //프로그램 종료
+		case 4: //프로그램 종료
 			printf("프로그램을 종료합니다.\n");
 			escape = 0;
 			break;
@@ -120,7 +116,7 @@ void studentInformation(void) { //학생 인적사항 관리 함수. 조대영 담당
 	printf("********************\n학생 인적사항 관리 모드\n");
 
 	while (1) {
-		printf("********************\n\t-메뉴-\n1.학생 추가\n2.학생 조회\n3.학생 정보 삭제\n4.메인 화면으로\n********************\n입력: ");
+		printf("********************\n\t-메뉴-\n1.학생 추가\n2.학생 조회\n3.학생 정보 삭제\n4.학생 리스트 정렬\n5.메인 화면으로\n********************\n입력: ");
 		scanf_s("%d", &select);
 
 		switch (select) {
@@ -134,6 +130,9 @@ void studentInformation(void) { //학생 인적사항 관리 함수. 조대영 담당
 			deleteInfo(); //학생 정보 삭제 함수로 분기
 			break;
 		case 4:
+			sort();
+			break;
+		case 5:
 			return;
 			break;
 		default: //잘못 된 값 입력 시 다시 되돌아 감
@@ -160,6 +159,7 @@ void addInfo() {
 	for (int i = 0; i < 3; i++) { //성적 초기화
 		studentInfo[studentCount].scores[i] = -1;
 	}
+	studentInfo[studentCount].attendance = 0;
 	printf("---추가 완료---\n");
 	studentCount++; //정상적으로 학생 추가 시 학생 수 1 증가
 }
@@ -185,7 +185,7 @@ void deleteInfo() { //학생 정보 삭제 시 사용하는 함수. 정상적으로 회원이 삭제되�
 	}
 	inquiryInfo(studentCount);
 	printf("삭제하고 싶은 학생 정보의 번호를 입력하세요.");
-	scanf("%d", &m);
+	scanf_s("%d", &m);
 	if (m < 0 || m >= studentCount) { //없는 학생 번호 입력 시 오류 출력 및 함수 종료. false를 돌려 줌
 		printf("잘못된 값입니다.\n");
 		return 0;
@@ -209,12 +209,135 @@ int isEmpty() {
 	}
 }
 
+void sort() {
+	struct Student v[20];
+	struct Student n;
+	char c;
+
+	if (studentCount == 0) { //등록 된 학생이 한 명도 없으면 없음을 알리고 함수 종료
+		printf("학생 정보가 없습니다.\n");
+		return;
+	}
+
+	for (int i = 0; i < studentCount; i++) {
+		v[i] = studentInfo[i];
+	}
+
+	for (int i = 1; i < studentCount; i++) {
+		for (int y = i; y > 0; y--) {
+			if (strcmp(v[y].name, v[y - 1].name) < 0) {
+				n = v[y];
+				v[y] = v[y - 1];
+				v[y - 1] = n;
+			}
+			else {
+				break;
+			}
+		}
+	}
+
+	system("cls");
+	printf("학생 정보 출력\n********************************************************************************\n번호\t\t이름\t\t나이\t\t휴대폰 번호\t\t주소\t\t\n");
+	for (int i = 0; i < studentCount; i++) {
+		printf("%d\t\t%s\t\t%d\t\t%s\t\t%s\n", i, v[i].name, v[i].age, v[i].phone, v[i].address);
+	}
+	printf("********************************************************************************\n정렬 완료. 총 %d명의 학생 정보가 있습니다.\n이대로 저장 하시겠습니까(y/n)? ", studentCount);
+	scanf_s(" %c", &c);
+	if ((c == 'y') || (c == 'Y')) {
+		for (int i = 0; i < studentCount; i++) {
+			studentInfo[i] = v[i];
+		}
+		printf("적용 완료!\n");
+	}
+	else {
+		printf("선택 화면으로 돌아갑니다.\n");
+	}
+}
+
 
 //-----------------------------------------------------------------------------------출결관리 함수. 정재헌 담당
 
 
 void attendance(void) {
-	//여기에 구현하시면 됩니다. 이 함수 바깥쪽에 뭔가 작성하실 일 있으시면 그 부분은 따로 주석으로 표시해주시면 제가 확인해서 적용하도록 하겠습니다.
+	int select;
+
+	while (1) {
+		printf("1.출결 관리 2.출결 현황 조회 3.메인 화면으로\n선택: ");
+		scanf_s("%d", &select);
+
+		switch (select) {
+		case 1:
+			attendanceAdd();
+			break;
+		case 2:
+			attendanceSearch();
+			break;
+		case 3:
+			return;
+			break;
+		default:
+			printf_s("잘못 된 입력\n");
+			break;
+		}
+	}
+}
+
+void attendanceAdd(void) {
+	int selectStudent;
+	int selectAttendance;
+
+	inquiryInfo();
+	if (isEmpty()) {
+		return;
+	}
+
+	printf("학생 번호 선택: ");
+	scanf_s("%d", &selectStudent);
+	printf("1.출석 2.결석 3.지각\n선택: ");
+	scanf_s("%d", &selectAttendance);
+
+	switch (selectAttendance) {
+	case 1:
+		studentInfo[selectStudent].attendance = 1;
+		printf("%s학생 출석 처리 완료\n", studentInfo[selectStudent].name);
+		break;
+	case 2:
+		studentInfo[selectStudent].attendance = 0;
+		printf("%s학생 결석 처리 완료\n", studentInfo[selectStudent].name);
+		break;
+	case 3:
+		studentInfo[selectStudent].attendance = 2;
+		printf("%s학생 지각 처리 완료\n", studentInfo[selectStudent].name);
+		break;
+	default:
+		break;
+	}
+}
+
+void attendanceSearch() {
+
+	if (studentCount == 0) { //등록 된 학생이 한 명도 없으면 없음을 알리고 함수 종료
+		printf("학생 정보가 없습니다.\n");
+		return;
+	}
+	system("cls");
+	printf("학생 정보 출력\n********************************************************************************\n번호\t\t이름\t\t출결 현황\t\t\n");
+	for (int i = 0; i < studentCount; i++) {
+		switch (studentInfo[i].attendance) {
+		case 1:
+			printf("%d\t\t%s\t\t출석\n", i, studentInfo[i].name);
+			break;
+		case 2:
+			printf("%d\t\t%s\t\t지각\n", i, studentInfo[i].name);
+			break;
+		case 0:
+			printf("%d\t\t%s\t\t결석\n", i, studentInfo[i].name);
+			break;
+		default:
+			break;
+		}
+	}
+	printf("********************************************************************************\n총 %d명의 학생 정보가 있습니다.\n", studentCount);
 }
 
 
@@ -360,12 +483,4 @@ void ViewStuData(int n) {
 	printf("%s 학생의 %s: %.1lf점, %s: %.1lf점, %s: %.1lf점 총점: %.1lf점", studentInfo[n].name, stitles[0], studentInfo[n].scores[0], stitles[1], studentInfo[n].scores[1], stitles[2], studentInfo[n].scores[2], studentInfo[n].scores[0] + studentInfo[n].scores[1] + studentInfo[n].scores[2]);
 
 	printf("\n");
-}
-
-
-//-----------------------------------------------------------------------------------좌석배정 함수. 조진욱 담당
-
-
-void seat(void) {
-	//여기에 구현하시면 됩니다. 이 함수 바깥쪽에 뭔가 작성하실 일 있으시면 그 부분은 따로 주석으로 표시해주시면 제가 확인해서 적용하도록 하겠습니다.
 }
