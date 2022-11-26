@@ -207,12 +207,12 @@ void countLoad() {
 	FILE* fp;
 	if ((fp = fopen("studentCount.txt", "r")) == NULL) {
 		system("cls");
-		printf("파일열기 실패\n");
+		printf("---파일열기 실패---\n");
 		return;
 	}
 	else {
 		system("cls");
-		printf("파일열기 성공\n");
+		printf("---파일열기 성공---\n");
 	}
 
 	fscanf(fp, "%d", &studentCount);
@@ -227,11 +227,11 @@ void countLoad() {
 void fileLoad() {
 	FILE* fp;
 	if ((fp = fopen("studentData.txt", "r")) == NULL) {
-		printf("파일열기 실패\n");
+		printf("---파일열기 실패---\n");
 		return;
 	}
 	else {
-		printf("파일열기 성공\n");
+		printf("---파일열기 성공---\n");
 	}
 
 	fscanf(fp, "%d", &studentCount);
