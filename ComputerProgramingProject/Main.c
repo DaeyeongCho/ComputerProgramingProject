@@ -274,7 +274,9 @@ void attendance(void) {
 			return;
 			break;
 		default:
-			printf_s("잘못 된 입력\n");
+			system("cls");
+			printf_s("---잘못된 입력---\n");
+			getchar();
 			break;
 		}
 	}
@@ -405,7 +407,11 @@ void grade(void) {
 		case 2: RemoveStudent(); break;
 		case 3: FindStudent(); break;
 		case 4: ListStudent(); break;
-		default: printf("잘못 선택하였습니다.\n"); break;
+		default: 
+			system("cls");
+			printf("---잘못 선택하였습니다.---\n");
+			getchar();
+			break;
 		}
 	}
 	printf("프로그램 종료\n");
@@ -440,11 +446,11 @@ void AddStudent() { //학생 데이터 입력
 		return;
 	}
 
-	printf("%s 학생의 성적을 입력합니다.", studentInfo[num].name);
+	printf("%s 학생의 성적을 입력합니다.\n", studentInfo[num].name);
 
 	do
 	{
-		printf("시혐 점수(0.0~60.0):");
+		printf("시혐 점수(0.0~60.0): ");
 		scanf_s("%lf", &score);
 		if ((score < 0.0) || (score > 60.0)) {
 			printf("잘못된 범위입니다.\n");
@@ -455,7 +461,7 @@ void AddStudent() { //학생 데이터 입력
 
 	do
 	{
-		printf("과제 점수(0.0~30.0):");
+		printf("과제 점수(0.0~30.0): ");
 		scanf_s("%lf", &score);
 		if ((score < 0.0) || (score > 30.0)) {
 			printf("잘못된 범위입니다.\n");
@@ -525,11 +531,11 @@ void ListStudent() { //목록 보기
 	}
 
 	system("cls");
-	printf("학생 성적 출력(성적이 -1인 곳은 미입력)\n********************************************************************************\n번호\t\t이름\t\t%s\t\t%s\t\t%s\t\t총점\n", stitles[0], stitles[1], stitles[2]);
+	printf("학생 성적 출력(성적이 -1인 곳은 미입력)\n********************************************************************************************************\n번호\t\t이름\t\t%s\t\t%s\t\t%s\t\t총점\n", stitles[0], stitles[1], stitles[2]);
 	for (int i = 0; i < studentCount; i++) {
 		printf("%d\t\t%s\t\t%.1lf\t\t\t%.1lf\t\t\t%.1lf\t\t\t%.1lf\n", i, studentInfo[i].name, studentInfo[i].scores[0], studentInfo[i].scores[1], studentInfo[i].scores[2], studentInfo[i].scores[0] + studentInfo[i].scores[1] + studentInfo[i].scores[2]);
 	}
-	printf("********************************************************************************\n총 %d명의 성적 정보가 있습니다.\n\n\n", studentCount);
+	printf("********************************************************************************************************\n총 %d명의 성적 정보가 있습니다.\n\n\n", studentCount);
 }
 int IsAvailNum(int num) { //유효한 번호인지 판별
 	return (num >= 0) && (num <= studentCount - 1);
