@@ -17,6 +17,14 @@ struct Student studentInfo[20]; //구조체 20개 생성. 학생 최대 20명까지 등록 가능
 
 int studentCount = 0; //등록된 학생의 숫자를 나타냄. 등록 된 학생 수 만큼 반복할 때도 유용함. 코딩 하실 때 활용하시라고 전역변수로 해두긴 했는데 현재 등록 되어있는 학생 수와 일치해야 합니다. 값이 틀리면 오류가 날 수 있으므로 함부로 값을 바꾸면 안됩니다.
 
+//-----------------------------------------------------------------------------------파일 처리
+
+void fileProcessing();
+void fileSave();
+void fileLoad();
+void countSave();
+void countLoad();
+
 //-----------------------------------------------------------------------------------조대영 변수, 함수 원형
 
 void studentInformation(void); //학생 인적사항 관리 함수 원형
@@ -43,7 +51,6 @@ void RemoveStudent();//학생 데이터 삭제
 void FindStudent();//학생 검색
 void ListStudent();//목록 보기
 int IsAvailNum(int num);//유효한 번호인지 판별
-int IsAvailScore(double score, int c);//유효한 성적인지 판별
 void ViewStuData(int n);
 
 //-----------------------------------------------------------------------------------
@@ -58,7 +65,7 @@ int main(void) {
 	printf("********************\n학생 관리 앱\nMade By 조대영, 길민준, 정재헌, 조진욱\n"); //타이틀 출력
 
 	while (1) {
-		printf("********************\n\t-메뉴-\n1.학생 인적사항 관리\n2.출결 관리\n3.성적 관리\n4.끝내기\n********************\n입력: "); //메뉴 출력
+		printf("********************\n\t-메뉴-\n1.학생 인적사항 관리\n2.출결 관리\n3.성적 관리\n4.학생 파일 저장/불러오기\n5.끝내기\n********************\n입력: "); //메뉴 출력
 		scanf_s("%d", &select); //메뉴 선택
 
 		switch (select) {
@@ -74,11 +81,16 @@ int main(void) {
 			grade();
 			system("cls");
 			break;
-		case 4: //프로그램 종료
+		case 4:
+			fileProcessing(); //파일 처리
+			system("cls");
+			break;
+		case 5: //프로그램 종료
 			printf("프로그램을 종료합니다.\n");
 			return 0;
 			break;
 		default: //잘못 된 값 입력 시 다시 되돌아 감
+			system("cls");
 			printf("잘못된 입력입니다.\n");
 			getchar();
 			break;
@@ -87,6 +99,162 @@ int main(void) {
 	return 0;
 }
 
+//-----------------------------------------------------------------------------------파일 처리
+
+void fileProcessing() {
+	char select;
+	system("cls");
+
+	printf("********************\n파일 저장/불러오기 화면\n");
+
+	while (1) {
+		int select;
+
+		printf("********************\n1.학생 데이터 저장\n2.학생 데이터 불러오기\n3.메인 화면으로\n********************\n입력: ");
+		scanf_s("%d", &select);
+
+		switch (select) {
+		case 1:
+			printf("데이터 저장 시 기존 데이터를 덮어씁니다.\n그래도 저장하시겠습니까(y/n): ");
+			scanf_s(" %c", &select);
+			if ((select == 'y') || (select == 'Y')) {
+				countSave();
+				fileSave();
+			}
+			else {
+				system("cls");
+				printf("---현재 데이터를 저장하지 않고 선택 화면으로 돌아갑니다.---\n");
+			}
+			break;
+		case 2:
+			printf("데이터 불러오기 시 현재 실행중인 내용이 지워집니다.\n그래도 저장하시겠습니까(y/n): ");
+			scanf_s(" %c", &select);
+			if ((select == 'y') || (select == 'Y')) {
+				countLoad();
+				fileLoad();
+			}
+			else {
+				system("cls");
+				printf("---데이터를 불러오지 않고 선택 화면으로 돌아갑니다.---\n");
+			}
+			break;
+		case 3:
+			return;
+			break;
+		default:
+			system("cls");
+			printf("---잘못된 입력입니다.---\n");
+			getchar();
+			break;
+		}
+	}
+}
+
+void countSave() {
+	FILE* fp;
+	fp = fopen("studentCount.txt", "w");
+
+	if (fp == NULL) {
+		system("cls");
+		printf("---파일열기 실패---\n");
+		return;
+	}
+	else {
+		system("cls");
+		printf("---파일열기 성공---\n");
+	}
+
+	fprintf(fp, "%d\n", studentCount);
+
+	fclose(fp);
+
+	printf("---학생 수 저장 완료---\n");
+
+	return;
+}
+
+void fileSave() {
+	FILE* fp;
+	fp = fopen("studentData.txt", "w");
+
+	if (fp == NULL) {
+		printf("---파일열기 실패---\n");
+		return;
+	}
+	else {
+		printf("---파일열기 성공---\n");
+	}
+
+	for (int i = 0; i < studentCount; i++) {
+		fprintf(fp, "%s %d %s %s ", studentInfo[i].name, studentInfo[i].grade, studentInfo[i].studentID, studentInfo[i].phone);
+		for (int y = 0; y < 3; y++) {
+			fprintf(fp, "%lf ", studentInfo[i].scores[y]);
+		}
+		for (int y = 0; y < 15; y++) {
+			fprintf(fp, "%d ", studentInfo[i].attendance[y]);
+		}
+		fprintf(fp, "\n");
+	}
+
+	fclose(fp);
+
+	printf("---학생 정보 저장 완료---\n");
+
+	return;
+}
+
+void countLoad() {
+	FILE* fp;
+	if ((fp = fopen("studentCount.txt", "r")) == NULL) {
+		system("cls");
+		printf("파일열기 실패\n");
+		return;
+	}
+	else {
+		system("cls");
+		printf("파일열기 성공\n");
+	}
+
+	fscanf(fp, "%d", &studentCount);
+
+	fclose(fp);
+
+	printf("---학생 수 불러오기 완료---\n");
+
+	return;
+}
+
+void fileLoad() {
+	FILE* fp;
+	if ((fp = fopen("studentData.txt", "r")) == NULL) {
+		printf("파일열기 실패\n");
+		return;
+	}
+	else {
+		printf("파일열기 성공\n");
+	}
+
+	fscanf(fp, "%d", &studentCount);
+
+	for (int i = 0; i < studentCount; i++) {
+		fscanf(fp, "%s", studentInfo[i].name);
+		fscanf(fp, "%d", &studentInfo[i].grade);
+		fscanf(fp, "%s", studentInfo[i].studentID);
+		fscanf(fp, "%s", studentInfo[i].phone);
+		for (int y = 0; y < 3; y++) {
+			fscanf(fp, "%lf", &studentInfo[i].scores[y]);
+		}
+		for (int y = 0; y < 15; y++) {
+			fscanf(fp, "%d", &studentInfo[i].attendance[y]);
+		}
+	}
+
+	fclose(fp);
+
+	printf("---학생 수 불러오기 완료---\n");
+
+	return;
+}
 
 //-----------------------------------------------------------------------------------학생 추가 시 사용하는 함수. 조대영 담당
 
@@ -98,7 +266,7 @@ void studentInformation(void) { //학생 인적사항 관리 함수. 조대영 담당
 	printf("********************\n학생 인적사항 관리 화면\n");
 
 	while (1) {
-		printf("********************\n\t-메뉴-\n1.학생 추가\n2.학생 조회\n3.학생 정보 삭제\n4.학생 리스트 정렬\n5.메인 화면으로\n********************\n입력: ");
+		printf("********************\n1.학생 추가\n2.학생 조회\n3.학생 정보 삭제\n4.학생 리스트 정렬\n5.메인 화면으로\n********************\n입력: ");
 		scanf_s("%d", &select);
 
 		switch (select) {
@@ -118,7 +286,8 @@ void studentInformation(void) { //학생 인적사항 관리 함수. 조대영 담당
 			return;
 			break;
 		default: //잘못 된 값 입력 시 다시 되돌아 감
-			printf("잘못된 입력입니다.\n");
+			system("cls");
+			printf("---잘못된 입력입니다.---\n");
 			getchar();
 			break;
 		}
