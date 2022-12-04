@@ -9,8 +9,8 @@ struct Student { //구조체. 학생에 관한 정보 포함
 	int grade; //학년
 	char studentID[11]; //학번
 	char phone[13]; //전화번호
-	double scores[3]; //과목 수 0:출석 점수(10.0), 1:시험 성적(60.0), 2:과제물(30.0)
-	int attendance[15]; //0 결석, 1 출석, 2 지각
+	double scores[3]; //과목 수 0:출석 점수(10.0), 1:시험 성적(60.0), 2:과제물(30.0) 출석 점수는 기본적으로 10점임. 출결 기능에서 수정시마다 바뀜
+	int attendance[15]; //0 결석, 1 출석, 2 지각. 한명 당 총 15주차까지 있음. 기본적으로 모두 출석으로 되어있음.
 };
 
 struct Student studentInfo[20]; //구조체 20개 생성. 학생 최대 20명까지 등록 가능. 전역 변수
@@ -19,11 +19,11 @@ int studentCount = 0; //등록된 학생의 숫자를 나타냄. 등록 된 학생 수 만큼 반복할
 
 //-----------------------------------------------------------------------------------파일 처리
 
-void fileProcessing();
-void fileSave();
-void fileLoad();
-void countSave();
-void countLoad();
+void fileProcessing(); //파일처리 함수 원형
+void fileSave(); //학생 정보를 저장하는 함수 원형
+void fileLoad(); //학생 정보를 불러오는 함수 원형
+void countSave(); //학생 숫자를 저장하는 함수 원형
+void countLoad(); //학생 숫자를 불러오는 함수 원형
 
 //-----------------------------------------------------------------------------------조대영 변수, 함수 원형
 
@@ -31,13 +31,13 @@ void studentInformation(void); //학생 인적사항 관리 함수 원형
 void addInfo(); //학생 추가 시 사용하는 함수 원형
 void inquiryInfo(); //학생 조회 시 사용하는 함수 원형
 void deleteInfo(); //학생 정보 삭제 시 사용하는 함수 원형
-void sort();
+void sort(); //학생 정보를 이름 순으로 정렬하는 함수 원형
 
 //-----------------------------------------------------------------------------------정재헌 변수, 함수 원형
 
 void attendance(void); //출결관리 함수 원형
-void attendanceAdd(void);
-void attendanceSearch();
+void attendanceAdd(void); //학생 출석정보 수정
+void attendanceSearch(); //학생 출석정보 출력
 
 //-----------------------------------------------------------------------------------길민준 변수, 함수 원형
 
@@ -111,15 +111,15 @@ void fileProcessing() {
 		int select;
 
 		printf("********************\n1.학생 데이터 저장\n2.학생 데이터 불러오기\n3.메인 화면으로\n********************\n입력: ");
-		scanf_s("%d", &select);
+		scanf_s("%d", &select); //메뉴 선택
 
 		switch (select) {
-		case 1:
+		case 1: //학생 정보 파일로 저장
 			printf("데이터 저장 시 기존 데이터를 덮어씁니다.\n그래도 저장하시겠습니까(y/n): ");
 			scanf_s(" %c", &select);
 			if ((select == 'y') || (select == 'Y')) {
-				countSave();
-				fileSave();
+				countSave(); //학생 숫자 저장
+				fileSave(); //학생 정보 저장
 			}
 			else if ((select == 'n') || (select == 'N')) {
 				system("cls");
@@ -130,12 +130,12 @@ void fileProcessing() {
 				printf("---잘못된 입력입니다.---\n");
 			}
 			break;
-		case 2:
+		case 2: //학생 정보 파일 불러오기
 			printf("데이터 불러오기 시 현재 실행중인 내용이 지워집니다.\n그래도 불러오시겠습니까(y/n): ");
 			scanf_s(" %c", &select);
 			if ((select == 'y') || (select == 'Y')) {
-				countLoad();
-				fileLoad();
+				countLoad(); //학생 숫자 불러오기
+				fileLoad(); //학생 정보 불러오기
 			}
 			else if((select == 'n') || (select == 'N')) {
 				system("cls");
@@ -158,9 +158,9 @@ void fileProcessing() {
 	}
 }
 
-void countSave() {
+void countSave() { //학생의 숫자(int studentCount)는 여기서 따로 저장됩니다.
 	FILE* fp;
-	fp = fopen("studentCount.txt", "w");
+	fp = fopen("studentCount.txt", "w"); //파일 열기. (파일명, 쓰기 모드)
 
 	if (fp == NULL) {
 		system("cls");
@@ -174,16 +174,16 @@ void countSave() {
 
 	fprintf(fp, "%d\n", studentCount);
 
-	fclose(fp);
+	fclose(fp); //파일 닫기
 
 	printf("---학생 수 저장 완료---\n");
 
 	return;
 }
 
-void fileSave() {
+void fileSave() { //학생 정보를 저장합니다. 학생 숫자만큼 반복하여 저장하는 방식입니다.
 	FILE* fp;
-	fp = fopen("studentData.txt", "w");
+	fp = fopen("studentData.txt", "w"); //파일 열기. (파일명, 쓰기 모드)
 
 	if (fp == NULL) {
 		printf("---파일열기 실패---\n");
@@ -204,16 +204,16 @@ void fileSave() {
 		fprintf(fp, "\n");
 	}
 
-	fclose(fp);
+	fclose(fp); //파일 닫기
 
 	printf("---학생 정보 저장 완료---\n");
 
 	return;
 }
 
-void countLoad() {
+void countLoad() { //학생 숫자가 기록된 파일을 먼저 불러와 studentCount 전역변수에 집어넣습니다.
 	FILE* fp;
-	if ((fp = fopen("studentCount.txt", "r")) == NULL) {
+	if ((fp = fopen("studentCount.txt", "r")) == NULL) { //파일 열기. (파일명, 읽기 모드)
 		system("cls");
 		printf("---파일열기 실패---\n");
 		return;
@@ -225,16 +225,16 @@ void countLoad() {
 
 	fscanf(fp, "%d", &studentCount);
 
-	fclose(fp);
+	fclose(fp); //파일 닫기
 
 	printf("---학생 수 불러오기 완료---\n");
 
 	return;
 }
 
-void fileLoad() {
+void fileLoad() { //먼저 불러온 studentCount 값을 토대로 반복하여 파일의 학생 정보를 불러옵니다.
 	FILE* fp;
-	if ((fp = fopen("studentData.txt", "r")) == NULL) {
+	if ((fp = fopen("studentData.txt", "r")) == NULL) { //파일 열기. (파일명, 읽기 모드)
 		printf("---파일열기 실패---\n");
 		return;
 	}
@@ -257,7 +257,7 @@ void fileLoad() {
 		}
 	}
 
-	fclose(fp);
+	fclose(fp); //파일 닫기
 
 	printf("---학생 정보 불러오기 완료---\n");
 
@@ -378,9 +378,9 @@ int isEmpty() {
 	}
 }
 
-void sort() {
-	struct Student v[20];
-	struct Student n;
+void sort() { //학생을 이름 순으로 정렬하는 함수.
+	struct Student v[20]; //임의의 Student 구조체 배열 v 선언
+	struct Student n; //임시 기억 공간
 	char c;
 
 	if (studentCount == 0) { //등록 된 학생이 한 명도 없으면 없음을 알리고 함수 종료
@@ -389,11 +389,11 @@ void sort() {
 		return;
 	}
 
-	for (int i = 0; i < studentCount; i++) {
+	for (int i = 0; i < studentCount; i++) { //임의로 선언 된 구조체 배열 v에 학생 정보를 복사함.
 		v[i] = studentInfo[i];
 	}
 
-	for (int i = 1; i < studentCount; i++) {
+	for (int i = 1; i < studentCount; i++) { //여기서 임의로 선언 된 구조체 배열 v의 학생 데이터가 정렬됨.
 		for (int y = i; y > 0; y--) {
 			if (strcmp(v[y].name, v[y - 1].name) < 0) {
 				n = v[y];
@@ -408,12 +408,12 @@ void sort() {
 
 	system("cls");
 	printf("학생 정보 출력\n********************************************************************************\n번호\t\t이름\t\t학년\t\t학번\t\t휴대폰 번호\t\t\n");
-	for (int i = 0; i < studentCount; i++) {
+	for (int i = 0; i < studentCount; i++) { //앞에서 정렬 된 v의 내용을 출력합니다.
 		printf("%d\t\t%s\t\t%d\t\t%s\t%s\n", i, v[i].name, v[i].grade, v[i].studentID, v[i].phone);
 	}
 	printf("********************************************************************************\n정렬 완료. 총 %d명의 학생 정보가 있습니다.\n이대로 저장 하시겠습니까(y/n)? ", studentCount);
 	scanf_s(" %c", &c);
-	if ((c == 'y') || (c == 'Y')) {
+	if ((c == 'y') || (c == 'Y')) { //입력에 따라 정렬된 v의 내용을 StudentInfo에 복사하거나 아니면 무효로 함.
 		for (int i = 0; i < studentCount; i++) {
 			studentInfo[i] = v[i];
 		}
@@ -448,10 +448,10 @@ void attendance(void) {
 
 		switch (select) {
 		case 1:
-			attendanceAdd();
+			attendanceAdd(); //학생의 출결정보를 수정하는 함수
 			break;
 		case 2:
-			attendanceSearch();
+			attendanceSearch(); //학생의 출결정보를 조회하는 함수
 			break;
 		case 3:
 			return;
@@ -465,18 +465,18 @@ void attendance(void) {
 	}
 }
 
-void attendanceAdd(void) {
+void attendanceAdd(void) { //학생의 출석 정보를 수정하는 함수
 	int selectStudent, selectDay, selectAttendance;
 	int n = 10;
 
-	inquiryInfo();
-	if (isEmpty()) {
+	inquiryInfo(); //학생 리스트 출력
+	if (isEmpty()) { //학생 정보가 없으면 빠져나감.
 		return;
 	}
 
 	printf("학생 번호 선택: ");
 	scanf_s("%d", &selectStudent);
-	if ((selectStudent >= studentCount) || (selectStudent < 0)) {
+	if ((selectStudent >= studentCount) || (selectStudent < 0)) { //출결정보를 수정 할 학생 번호 선택
 		system("cls");
 		printf("---잘못된 번호입니다.---\n");
 		getchar();
@@ -484,7 +484,7 @@ void attendanceAdd(void) {
 	}
 	do {
 		printf("주차 선택(1~15): ");
-		scanf_s("%d", &selectDay);
+		scanf_s("%d", &selectDay); //몇주차 출결 정보를 수정할지 선택
 		if ((selectDay > 15) || (selectDay < 1)) {
 			printf("잘못된 값\n");
 			getchar();
@@ -493,7 +493,7 @@ void attendanceAdd(void) {
 	do
 	{
 		printf("1.출석 2.결석 3.지각\n선택: ");
-		scanf_s("%d", &selectAttendance);
+		scanf_s("%d", &selectAttendance); //출석, 결석, 지각 선택
 		if ((selectAttendance > 3) || (selectAttendance < 0)) {
 			printf("잘못된 값\n");
 			getchar();
@@ -502,7 +502,7 @@ void attendanceAdd(void) {
 
 	system("cls");
 
-	switch (selectAttendance) {
+	switch (selectAttendance) { //결과 화면 출력
 	case 1:
 		studentInfo[selectStudent].attendance[selectDay - 1] = 1;
 		printf("%s학생 %d주차 출석 처리 완료\n", studentInfo[selectStudent].name, selectDay);
@@ -519,7 +519,7 @@ void attendanceAdd(void) {
 		break;
 	}
 
-	for (int i = 0; i < 15; i++) {
+	for (int i = 0; i < 15; i++) { //결과를 성적 기능의 출결 점수에 반영함.
 		switch (studentInfo[selectStudent].attendance[i])
 		{
 		case 0:
@@ -542,7 +542,7 @@ void attendanceAdd(void) {
 	}
 }
 
-void attendanceSearch() {
+void attendanceSearch() { //학생들의 출석 정보를 출력하는 함수
 
 	if (studentCount == 0) { //등록 된 학생이 한 명도 없으면 없음을 알리고 함수 종료
 		system("cls");
@@ -615,15 +615,15 @@ void AddStudent() { //학생 데이터 입력
 	int num;
 	double score;
 
-	inquiryInfo();
-	if (isEmpty()) {
+	inquiryInfo(); //학생 정보 출력
+	if (isEmpty()) { //학생 정보가 없으면 빠져나감
 		return;
 	}
 
 	printf("점수 입력 할 학생 번호(0 ~ %d): ", studentCount - 1);
 	scanf_s("%d", &num);
 
-	if (IsAvailNum(num) == 0)//유효한 번호가 아닐 때
+	if (IsAvailNum(num) == 0)//유효한 번호인지 판별하는 IsAvailNum() 함수 호출 후 유효한 번호가 아닐 때 메세지 출력 후 빠져나감.
 	{
 		system("cls");
 		printf("---범위를 벗어난 학생 번호입니다.---\n");
@@ -635,23 +635,23 @@ void AddStudent() { //학생 데이터 입력
 	do
 	{
 		printf("시혐 점수(0.0~60.0): ");
-		scanf_s("%lf", &score);
+		scanf_s("%lf", &score); //시험 점수를 입력 함.
 		if ((score < 0.0) || (score > 60.0)) {
 			printf("잘못된 범위입니다.\n");
 			getchar();
 		}
-	} while ((score < 0.0) || (score > 60.0));
+	} while ((score < 0.0) || (score > 60.0)); //시험 점수 입력 범위을 벗어난 숫자 입력 시 다시 입력하도록 함.
 	studentInfo[num].scores[1] = score;
 
 	do
 	{
 		printf("과제 점수(0.0~30.0): ");
-		scanf_s("%lf", &score);
+		scanf_s("%lf", &score); //과제 점수를 입력 함.
 		if ((score < 0.0) || (score > 30.0)) {
 			printf("잘못된 범위입니다.\n");
 			getchar();
 		}
-	} while ((score < 0.0) || (score > 30.0));
+	} while ((score < 0.0) || (score > 30.0)); //과제 점수 입력 범위을 벗어난 숫자 입력 시 다시 입력하도록 함.
 	studentInfo[num].scores[2] = score;
 
 	system("cls");
@@ -662,22 +662,22 @@ void RemoveStudent() {//학생 데이터 삭제
 	int num = -1;
 	int s = 0;
 
-	inquiryInfo();
-	if (isEmpty()) {
+	inquiryInfo(); //학생 정보 출력
+	if (isEmpty()) { //학생 정보가 없으면 빠져나감
 		return;
 	}
 
 	printf("성적 초기화 할 학생 번호(0~%d): ", studentCount - 1);
-	scanf_s("%d", &num);
+	scanf_s("%d", &num); //초기화 할 학생 번호 입력
 
-	if (IsAvailNum(num) == 0)//유효한 번호가 아닐 때
+	if (IsAvailNum(num) == 0)//유효한 번호인지 판별하는 IsAvailNum() 함수 호출 후 유효한 번호가 아닐 때 메세지 출력 후 빠져나감.
 	{
 		system("cls");
 		printf("범위를 벗어난 학생 번호입니다.\n");
 		return;
 	}
 
-	for (s = 1; s < 3; s++)
+	for (s = 1; s < 3; s++) //학생의 시험 성적과 과제 성적을 -1로 초기화 함.
 	{
 		studentInfo[num].scores[s] = -1;
 	}
@@ -685,19 +685,19 @@ void RemoveStudent() {//학생 데이터 삭제
 	printf("삭제하였습니다.\n");
 }
 
-void FindStudent() { //학생 검색
+void FindStudent() { //한 명의 학생 성적 검색
 	int num = -1;
 	int s = 0;
 
-	inquiryInfo();
-	if (isEmpty()) {
+	inquiryInfo(); //학생 정보 출력
+	if (isEmpty()) { //학생 정보가 없으면 빠져나감
 		return;
 	}
 
 	printf("검색할 학생 번호(0~%d): ", studentCount - 1);
 	scanf_s("%d", &num);
 
-	if (IsAvailNum(num) == 0)//유효한 번호가 아닐 때
+	if (IsAvailNum(num) == 0)//유효한 번호인지 판별하는 IsAvailNum() 함수 호출 후 유효한 번호가 아닐 때 메세지 출력 후 빠져나감.
 	{
 		system("cls");
 		printf("---범위를 벗어난 학생 번호입니다.---\n");
@@ -705,7 +705,7 @@ void FindStudent() { //학생 검색
 	}
 
 	system("cls");
-	ViewStuData(num);
+	ViewStuData(num); //학생 한명의 성적 내역을 출력하는 ViewStuData() 함수 호출
 }
 
 void ListStudent() { //목록 보기
@@ -722,11 +722,11 @@ void ListStudent() { //목록 보기
 	}
 	printf("********************************************************************************************************\n총 %d명의 성적 정보가 있습니다.\n\n\n", studentCount);
 }
-int IsAvailNum(int num) { //유효한 번호인지 판별
+int IsAvailNum(int num) { //유효한 번호인지 판별하여 리턴함.
 	return (num >= 0) && (num <= studentCount - 1);
 }
 
-void ViewStuData(int n) {
+void ViewStuData(int n) { //학생 한명의 성적 내역을 출력하는 함수
 	int i = 0;
 	int s = 0;
 
