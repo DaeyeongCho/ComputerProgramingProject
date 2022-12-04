@@ -121,21 +121,29 @@ void fileProcessing() {
 				countSave();
 				fileSave();
 			}
+			else if ((select == 'n') || (select == 'N')) {
+				system("cls");
+				printf("---데이터를 저장하지 않고 선택 화면으로 돌아갑니다.---\n");
+			}
 			else {
 				system("cls");
-				printf("---현재 데이터를 저장하지 않고 선택 화면으로 돌아갑니다.---\n");
+				printf("---잘못된 입력입니다.---\n");
 			}
 			break;
 		case 2:
-			printf("데이터 불러오기 시 현재 실행중인 내용이 지워집니다.\n그래도 저장하시겠습니까(y/n): ");
+			printf("데이터 불러오기 시 현재 실행중인 내용이 지워집니다.\n그래도 불러오시겠습니까(y/n): ");
 			scanf_s(" %c", &select);
 			if ((select == 'y') || (select == 'Y')) {
 				countLoad();
 				fileLoad();
 			}
-			else {
+			else if((select == 'n') || (select == 'N')) {
 				system("cls");
 				printf("---데이터를 불러오지 않고 선택 화면으로 돌아갑니다.---\n");
+			}
+			else {
+				system("cls");
+				printf("---잘못된 입력입니다.---\n");
 			}
 			break;
 		case 3:
@@ -251,7 +259,7 @@ void fileLoad() {
 
 	fclose(fp);
 
-	printf("---학생 수 불러오기 완료---\n");
+	printf("---학생 정보 불러오기 완료---\n");
 
 	return;
 }
@@ -333,7 +341,7 @@ void inquiryInfo() { //학생 조회 시 사용하는 함수
 	printf("********************************************************************************\n총 %d명의 학생 정보가 있습니다.\n", studentCount);
 }
 
-void deleteInfo() { //학생 정보 삭제 시 사용하는 함수. 정상적으로 회원이 삭제되었는지 여부를 돌려줌
+void deleteInfo() { //학생 정보 삭제 시 사용하는 함수.
 	int m; //몇 번째 학생을 삭제 할 지 번호를 받는 변수
 	if (studentCount == 0) {
 		system("cls");
@@ -346,6 +354,7 @@ void deleteInfo() { //학생 정보 삭제 시 사용하는 함수. 정상적으로 회원이 삭제되�
 	if (m < 0 || m >= studentCount) { //없는 학생 번호 입력 시 오류 출력 및 함수 종료. false를 돌려 줌
 		system("cls");
 		printf("---잘못된 값입니다.---\n");
+		getchar();
 		return;
 	}
 	for (int i = m + 1; i < studentCount; i++) { //학생 정보 삭제 및 배열 뒷쪽의 학생 정보를 앞으로 당김.
@@ -411,8 +420,13 @@ void sort() {
 		system("cls");
 		printf("---변경 사항 적용 완료!---\n");
 	}
+	else if((c == 'n') || (c == 'N')) {
+		system("cls");
+		printf("---변경 사항을 적용하지 않고 선택 화면으로 돌아갑니다.---\n");
+	}
 	else {
 		system("cls");
+		printf("---잘못된 입력입니다.---\n");
 		printf("---변경 사항을 적용하지 않고 선택 화면으로 돌아갑니다.---\n");
 	}
 }
@@ -465,6 +479,7 @@ void attendanceAdd(void) {
 	if ((selectStudent >= studentCount) || (selectStudent < 0)) {
 		system("cls");
 		printf("---잘못된 번호입니다.---\n");
+		getchar();
 		return; 
 	}
 	do {
@@ -578,7 +593,7 @@ void grade(void) {
 		case 4: ListStudent(); break;
 		default: 
 			system("cls");
-			printf("---잘못 선택하였습니다.---\n");
+			printf("---잘못된 입력입니다.---\n");
 			getchar();
 			break;
 		}
@@ -684,7 +699,8 @@ void FindStudent() { //학생 검색
 
 	if (IsAvailNum(num) == 0)//유효한 번호가 아닐 때
 	{
-		printf("범위를 벗어난 학생 번호입니다.\n");
+		system("cls");
+		printf("---범위를 벗어난 학생 번호입니다.---\n");
 		return;
 	}
 
